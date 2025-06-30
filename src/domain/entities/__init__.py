@@ -188,3 +188,25 @@ class Horas:
             self.creditos += (self.horas * 10.0) # Exemplo: cada hora de palestra gera 10 créditos para o usuário
         else:
             self.creditos += (self.horas * 2.0)  # Exemplo: cada hora de outra atividade gera 2 créditos para o usuário
+
+@dataclass
+class Patrimonio:
+    """ 
+    Entity: Patrimonio
+    Representa um patrimônio da biblioteca, como computadores, móveis, etc.
+    """
+    id: str
+    nome: str 
+    tipo: str 
+    data_aquisicao: datetime
+    valor: float = 0.0
+    status: str = "ativo"  # ativo, inativo, manutenção
+
+    def desativar(self):
+        self.status = "inativo"
+
+    def ativar(self):
+        self.status = "ativo"
+
+    def enviar_para_manutencao(self):
+        self.status = "manutenção"

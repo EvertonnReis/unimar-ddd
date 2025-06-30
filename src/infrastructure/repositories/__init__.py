@@ -1,11 +1,11 @@
 # Infrastructure Layer - Repository Implementations
 
 from typing import List, Optional
-from src.domain.entities import Livro, Usuario, Emprestimo, Doacao, Horas
-from src.domain.repositories import LivroRepository, UsuarioRepository, EmprestimoRepository, DoacaoRepository, HorasRepository
+from src.domain.entities import Livro, Patrimonio, Usuario, Emprestimo, Doacao, Horas
+from src.domain.repositories import LivroRepository, UsuarioRepository, EmprestimoRepository, DoacaoRepository, HorasRepository, PatrimonioRepository
 from src.domain.value_objects.isbn import ISBN
 from src.domain.value_objects.email import Email
-from src.infrastructure.database.models import LivroModel, UsuarioModel, EmprestimoModel, DoacaoModel, HorasModel
+from src.infrastructure.database.models import LivroModel, PatrimonioModel, UsuarioModel, EmprestimoModel, DoacaoModel, HorasModel
 from src.models.user import db
 from datetime import datetime
 
@@ -357,3 +357,56 @@ class SQLAlchemyHorasRepository(HorasRepository):
             data=horas_model.data,
             creditos=horas_model.creditos
         )
+    
+class SQLAlchemyPatrimonioRepository(PatrimonioRepository):
+    def salvar(self, patrimonio: Patrimonio) -> None:
+        patrimonio_model = PatrimonioModel.query.filter_by(id=patrimonio.id).first()
+        if patrimonio_model:
+            patrimonio_model.nome = patrimonio.nome
+            patrimonio_model.tipo = patrimonio.tipo
+            patrimonio_model.data_aquisicao = patrimonio.data_aquisicao
+            patrimonio_model.valor = patrimonio.valor
+            patrimonio_model.status = patrimonio.status
+        else:
+            patrimonio_model = PatrimonioModel(
+                id=patrimonio.id,
+                nome=patrimonio.nome,
+                tipo=patrimonio.tipo,
+                data_aquisicao=patrimonio.data_aquisicao,
+                valor=patrimonio.valor,
+                status=patrimonio.status
+            )
+            db.session.add(patrimonio_model)
+        db.session.commit()
+
+    def buscar_por_id(self, id: str) -> Patrimonio:
+        patrimonio_model = PatrimonioModel.query.filter_by(id=id).first()
+        if not patrimonio_model:
+            return None
+        return Patrimonio(
+            id=patrimonio_model.id,
+            nome=patrimonio_model.nome,
+            tipo=patrimonio_model.tipo,
+            data_aquisicao=patrimonio_model.data_aquisicao,
+            valor=patrimonio_model.valor,
+            status=patrimonio_model.status
+        )
+
+    def buscar_todos(self) -> list[Patrimonio]:
+        patrimonios_model = PatrimonioModel.query.all()
+        return [
+            Patrimonio(
+                id=p.id,
+                nome=p.nome,
+                tipo=p.tipo,
+                data_aquisicao=p.data_aquisicao,
+                valor=p.valor,
+                status=p.status
+            ) for p in patrimonios_model
+        ]
+
+    def deletar(self, id: str) -> None:
+        patrimonio_model = PatrimonioModel.query.filter_by(id=id).first()
+        if patrimonio_model:
+            db.session.delete(patrimonio_model)
+            db.session.commit()

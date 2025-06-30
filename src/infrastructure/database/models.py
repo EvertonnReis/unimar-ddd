@@ -90,3 +90,15 @@ class HorasModel(db.Model):
     usuario = db.relationship('UsuarioModel', backref='horas')
     def __repr__(self):
         return f'<Horas {self.id}>'
+    
+class PatrimonioModel(db.Model):
+    __tablename__ = 'patrimonios'
+    id = db.Column(db.String(36), primary_key=True)
+    nome = db.Column(db.String(100), nullable=False)
+    tipo = db.Column(db.String(50), nullable=False)
+    data_aquisicao = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    valor = db.Column(db.Float, default=0.0, nullable=False)
+    status = db.Column(db.String(20), default="ativo", nullable=False)
+
+    def __repr__(self):
+        return f'<Patrimonio {self.nome}>'

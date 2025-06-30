@@ -2,7 +2,7 @@
 
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from src.domain.entities import Livro, Usuario, Emprestimo, Doacao, Horas
+from src.domain.entities import Livro, Usuario, Emprestimo, Doacao, Horas, Patrimonio
 
 
 class LivroRepository(ABC):
@@ -168,4 +168,21 @@ class HorasRepository(ABC):
     @abstractmethod
     def deletar(self, id: str) -> None:
         """Deleta uma hora"""
+        pass
+
+class PatrimonioRepository(ABC):
+    @abstractmethod
+    def salvar(self, patrimonio: Patrimonio) -> None:
+        pass
+
+    @abstractmethod
+    def buscar_por_id(self, id: str) -> Optional[Patrimonio]:
+        pass
+
+    @abstractmethod
+    def buscar_todos(self) -> List[Patrimonio]:
+        pass
+
+    @abstractmethod
+    def deletar(self, id: str) -> None:
         pass

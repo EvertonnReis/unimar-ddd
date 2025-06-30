@@ -1,8 +1,8 @@
 # Application Layer - Use Cases
 
 from typing import List, Optional
-from src.domain.entities import Livro, Usuario, Emprestimo, Doacao, Horas
-from src.domain.repositories import LivroRepository, UsuarioRepository, EmprestimoRepository, DoacaoRepository, HorasRepository
+from src.domain.entities import Livro, Patrimonio, Usuario, Emprestimo, Doacao, Horas
+from src.domain.repositories import LivroRepository, PatrimonioRepository, UsuarioRepository, EmprestimoRepository, DoacaoRepository, HorasRepository
 from src.domain.value_objects.isbn import ISBN
 from src.domain.value_objects.email import Email
 from src.application.dtos import LivroDTO, UsuarioDTO, EmprestimoDTO, DoacaoDTO, HorasDTO
@@ -320,3 +320,12 @@ class DoarHorasUseCase:
         self._usuario_repository.salvar(usuario)
         
         return usuario.creditos
+    
+class CriarPatrimonioUseCase:
+    def __init__(self, patrimonio_repository: PatrimonioRepository):
+        self.patrimonio_repository = patrimonio_repository
+
+    def executar(self, nome: str, tipo: str, valor: float):
+        patrimonio = Patrimonio(nome=nome, tipo=tipo, valor=valor)
+        self.patrimonio_repository.salvar(patrimonio)
+        return patrimonio.id

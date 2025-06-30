@@ -2,12 +2,12 @@
 
 from flask import Blueprint, request, jsonify
 from src.application.use_cases import (
-    CriarLivroUseCase, BuscarLivrosUseCase, CriarUsuarioUseCase,
+    CriarLivroUseCase, BuscarLivrosUseCase, CriarPatrimonioUseCase, CriarUsuarioUseCase,
     EmprestarLivroUseCase, DevolverLivroUseCase, ListarEmprestimosUseCase, DoarLivroUseCase, DoarHorasUseCase
 )
 from src.application.dtos import LivroDTO, UsuarioDTO, EmprestimoRequestDTO, DevolucaoRequestDTO, DoacaoDTO, HorasDTO
 from src.infrastructure.repositories import (
-    SQLAlchemyLivroRepository, SQLAlchemyUsuarioRepository, SQLAlchemyEmprestimoRepository, SQLAlchemyDoacaoRepository, SQLAlchemyHorasRepository
+    SQLAlchemyLivroRepository, SQLAlchemyPatrimonioRepository, SQLAlchemyUsuarioRepository, SQLAlchemyEmprestimoRepository, SQLAlchemyDoacaoRepository, SQLAlchemyHorasRepository
 )
 
 # Criar blueprint para a API da biblioteca
@@ -19,6 +19,7 @@ usuario_repository = SQLAlchemyUsuarioRepository()
 emprestimo_repository = SQLAlchemyEmprestimoRepository()
 doacao_repository = SQLAlchemyDoacaoRepository()
 horas_repository = SQLAlchemyHorasRepository()
+patrimonio_repository = SQLAlchemyPatrimonioRepository()
 
 @biblioteca_bp.route('/livros', methods=['POST'])
 def criar_livro():
@@ -258,6 +259,27 @@ def doar_horas():
         return jsonify({'erro': str(e)}), 400
     except Exception as e:
         return jsonify({'erro': 'Erro interno do servidor'}), 500   
+
+@biblioteca_bp.route('/patrimonios', methods=['POST'])
+def criar_patrimonio():
+    data = request.get_json()
+    if not data or not all(k in data for k in ('nome', 'tipo', 'valor')):
+        return jsonify({'erro': 'Dados obrigatórios: nome, tipo, valor'}), 400
+    use_case = CriarPatrimonioUseCase(patrimonio_repository)
+    patrimonio_id = use_case.executar(data['nome'], data['tipo'], float(data['valor']))
+    return jsonify({'mensagem': 'Patrimônio criado com sucesso', 'id': patrimonio_id}), 201
+
+@biblioteca_bp.route('/patrimonios', methods=['GET'])
+def listar_patrimonios():
+    patrimonios = patrimonio_repository.buscar_todos()
+    return jsonify([{
+        'id': p.id,
+        'nome': p.nome,
+        'tipo': p.tipo,
+        'data_aquisicao': p.data_aquisicao.isoformat(),
+        'valor': p.valor,
+        'status': p.status
+    } for p in patrimonios]), 200
 
 @biblioteca_bp.route('/health', methods=['GET'])
 def health_check():

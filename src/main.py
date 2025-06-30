@@ -8,7 +8,7 @@ from flask_cors import CORS
 from src.models.user import db
 from src.routes.user import user_bp
 from src.presentation.controllers import biblioteca_bp
-from src.infrastructure.database.models import LivroModel, UsuarioModel, EmprestimoModel
+from src.infrastructure.database.models import LivroModel, UsuarioModel, EmprestimoModel, PatrimonioModel
 
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
